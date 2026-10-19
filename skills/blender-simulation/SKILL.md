@@ -9,6 +9,8 @@ metadata:
 
 # Simulation
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core`. Procedural sim zones are in `blender-geometry-nodes`.
 
 ## One call
@@ -58,7 +60,7 @@ Domain object (`FLUID` modifier `fluid_type="DOMAIN"`, `domain_type="LIQUID"|"GA
 - Always bake before rendering/exporting, and never rely on viewport playback order.
 - GN simulation zones: bake per modifier (`mod.bakes`, `object.geometry_node_bake_single`), or step frames sequentially (script) in background.
 - Point caches in background: stepping frames from `frame_start` fills the cache. `ptcache.bake_all(bake=True)` needs a valid context.
-- Verify with `look(mode="frames")` plus the numbers (`min_z` ≈ the collider top = contact, no tunnelling).
+- Verify with `bridge.review(objects=[...], frames=[...])` and open the sheets plus the numbers (`min_z` ≈ the collider top = contact, no tunnelling).
 
 ## Gotchas
 - Objects tunnelling through colliders: thin colliders, too few substeps, or too-fast motion. Thicken, raise substeps/quality, or use a bigger collision distance.

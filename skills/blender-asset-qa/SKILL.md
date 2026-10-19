@@ -9,6 +9,8 @@ metadata:
 
 # Asset QA (review gate)
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 Never assume a generated or edited mesh is correct. Check it with numbers, then look at it.
 
 ## Procedure
@@ -17,7 +19,7 @@ Never assume a generated or edited mesh is correct. Check it with numbers, then 
    Profiles: `game` (default), `render` (lenient), `print` (watertight required), `roblox` (20k tris/mesh, watertight, no n-gons, ≤4 influences).
 2. **Fix every `errors` entry** (table below), then re-run until `"pass": true`. Each warning must be either fixed or explicitly accepted, with the reason reported to the user.
 3. **Visual check, always**:
-   - Live: MCP `look` with `mode="angles"` on the targets, once in `material`/`solid` shading and once in `wireframe`. Use `xray` for internals.
+   - Live: `bridge.review(objects=[...], mode="solid")`, then `mode="wire"`; open both returned PNG sheets. Check PBR using the live MATERIAL/RENDERED viewport screenshot. For internals and bones, use live X-ray screenshots; see the local MCP reference.
    - Headless: `scripts/review_shots.py -- --objects ... --mode random` (one color per object, which makes detached pieces obvious), then `--mode wire` for topology. Open the returned PNG.
 4. Report: tris per object, issues fixed, and remaining accepted warnings.
 

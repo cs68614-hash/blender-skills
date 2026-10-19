@@ -9,15 +9,17 @@ metadata:
 
 # Character Rigging
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core`. Faces and shape keys are in `blender-facial-shapekeys`, animation in `blender-animation`.
 
 ## Pipeline (scripts chain; each returns JSON)
 1. **Prepare the mesh**: scale applied, facing **-Y**, feet at Z=0, centered on X=0, symmetric, in T- or A-pose (A-pose 30–45° deforms shoulders better). Run `blender-asset-qa` first.
 2. **Metarig**: `scripts/rigify_build.py -- --add basic_human --fit Body` (`human` adds a full face rig; for games use `--no-face` + shape keys).
-3. **Place the joints** (the fit only scales). Edit bones in X-ray against the mesh: joints sit at the **pivot of rotation** (inside the volume, not on the surface). The elbow and knee need a slight bend toward their natural direction (elbow back, knee forward) so the IK solves the right way. Symmetrize: `bpy.ops.armature.symmetrize()`. Check with `look` (`shading="xray"`).
+3. **Place the joints** (the fit only scales). Edit bones in X-ray against the mesh: joints sit at the **pivot of rotation** (inside the volume, not on the surface). The elbow and knee need a slight bend toward their natural direction (elbow back, knee forward) so the IK solves the right way. Symmetrize: `bpy.ops.armature.symmetrize()`. Check bone placement with live X-ray viewport screenshots (local MCP reference).
 4. **Generate**: `--metarig META_Body --generate` gives `RIG_Body` (control rig: FK/IK, IK/FK snapping, tweak bones, bone collections).
 5. **Skin**: `scripts/bind_mesh.py -- --armature RIG_Body --meshes Body`. It uses heat weights, switches to the voxel-proxy transfer automatically when heat fails (non-manifold, kitbashed or AI meshes), then cleans to 4 influences and normalizes.
-6. **Stress test**: `scripts/stress_poses.py -- --armature RIG_Body`, then `look(mode="frames", frames=[1,10,20,30,40,50])`. Fix collapsing elbows, candy-wrapped forearms, a sunken shoulder or a hip crease (below).
+6. **Stress test**: `scripts/stress_poses.py -- --armature RIG_Body`, then `bridge.review(objects=["Body"], frames=[1,10,20,30,40,50])` and open the sheets. Fix collapsing elbows, candy-wrapped forearms, a sunken shoulder or a hip crease (below).
 7. **Engine skeleton**: `rigify_build.py -- --rig RIG_Body --game-skeleton` gives `GAME_RIG_Body` = `root` + DEF bones in a clean hierarchy, with `DEF-` stripped, constrained to the control rig and with the meshes re-targeted. Animate with the control rig, then bake to the game skeleton and export it (`blender-animation` → `blender-export-pipelines`).
 8. **Validate**: `scripts/rig_check.py -- --armature GAME_RIG_Body --profile unity|unreal|roblox [--fix]`.
 

@@ -9,14 +9,16 @@ metadata:
 
 # Workflow Recipes
 
-`S` = the skills folder. Every `.py` runs headless via `python S/blender-core/scripts/run_in_blender.py --blend F.blend S/<skill>/scripts/<x>.py -- ...`, or live via MCP import + `run()` (see `blender-core`). **Gate** = stop and fix before continuing. Save after every stage (`--save`).
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
+`S` = the skills folder. Blender scripts run headless via `python S/blender-core/scripts/run_in_blender.py --blend F.blend S/<skill>/scripts/<x>.py -- ...`, or live via MCP import + `run()` (see `blender-core`). The host-only Poly Haven fetcher runs directly with Python, outside the live UI. **Gate** = stop and fix before continuing. Save after every stage (`--save`).
 
 ## 1. Game prop, mid-poly (fast, no bake)
 1. Blockout at real scale (`blender-hardsurface-modeling`). Gate: `ob.dimensions` vs reference.
 2. UV the blockout **before** beveling (the Bevel/Boolean modifiers carry UVs): `uv_pack.py --objects SM_X --method seams --seams-from-sharp 60` → `texel_density.py --res 2048 --set 512`
 3. `apply_stack.py --objects SM_X --preset midpoly [--cutters ...]` (keep it live; `--apply --triangulate` only on the export copy)
-4. Materials: `build_pbr_material.py --preset ...` or tiling/trim textures.
-5. Gate: `qa_check.py --objects SM_X --profile game` passes, plus `look` (angles, material + wireframe).
+4. Materials: select scanned/licensed textures using [material sourcing](../blender-pbr-materials/references/material-sourcing.md), then `build_pbr_material.py --textures ...`; use presets/procedurals where the art direction calls for them. Match real scale and grain direction, retain source/license manifests, and bake to one atlas when required by the delivery budget.
+5. Gate: `qa_check.py --objects SM_X --profile game` passes, plus `bridge.review` sheets (solid + wire) and live PBR viewport screenshots.
 6. `mesh_stats.py --budget <platform>` → `make_lods.py --objects SM_X --rename`
 7. `export_asset.py --preset <engine> --objects SM_X_LOD0 SM_X_LOD1 ...` Gate: re-import dims / GLB summary.
 
@@ -26,15 +28,15 @@ metadata:
 3. `uv_pack.py --objects SM_X --method seams --seams-from-sharp 60 --margin-px 16`
 4. Gate: `qa_check.py` on `SM_X` (game) **and** `X_high` (render profile, no inverted parts).
 5. `bake_maps.py --low SM_X --high X_high --maps normal ao curvature id --pack-orm [--directx for Unreal]`
-6. `build_pbr_material.py --name M_X --textures //textures --objects SM_X` (+ basecolor/roughness from texturing).
-7. Gate: `look` in material shading (no seams/waviness), then steps 6–7 of recipe 1.
+6. Select source PBR maps using [material sourcing](../blender-pbr-materials/references/material-sourcing.md). Add source BaseColor/Roughness and geometric bakes, then `build_pbr_material.py --name M_X --textures //textures --objects SM_X`. Preserve scan UVs while baking any atlas and retain provenance.
+7. Gate: live MATERIAL/RENDERED viewport screenshots (no seams/waviness), then steps 6–7 of recipe 1.
 
 ## 3. Game character (sculpt or AI mesh → animated export)
-1. Source mesh (sculpt / `generate_3d` / scan) at real height, facing -Y, feet on Z=0. Run `qa_check.py --profile render`.
+1. Source mesh (sculpt / supplied generated mesh / scan) at real height, facing -Y, feet on Z=0. Run `qa_check.py --profile render`.
 2. `auto_retopo.py --method quadriflow --tris 20000` (or manual retopo for heroes, keeping the edge flow rules). `uv_pack.py --method min_stretch`.
 3. `bake_maps.py --low Body --high Body_src --maps normal ao basecolor` (basecolor via emission override if the source has colors/materials).
-4. `rigify_build.py --add basic_human --fit Body` → place joints (look xray) → `--metarig META_Body --generate`
-5. `bind_mesh.py --armature RIG_Body --meshes Body` → `stress_poses.py --armature RIG_Body` → `look(mode="frames")`. Gate: no collapse at the elbows/knees/shoulders. Fix weights.
+4. `rigify_build.py --add basic_human --fit Body` → place joints (live X-ray viewport screenshots) → `--metarig META_Body --generate`
+5. `bind_mesh.py --armature RIG_Body --meshes Body` → `stress_poses.py --armature RIG_Body` → `bridge.review(objects=["Body"], frames=[1,10,20,30,40,50])` and open the sheets. Gate: no collapse at the elbows/knees/shoulders. Fix weights.
 6. `rigify_build.py --rig RIG_Body --game-skeleton` → `rig_check.py --armature GAME_RIG_Body --profile unity|unreal`
 7. Animate on RIG_Body (`blender-animation`) → `bake_action.py --source RIG_Body --target GAME_RIG_Body [--root-motion xy --hips spine]`
 8. `export_asset.py --preset unity_skeletal|unreal_skeletal --objects GAME_RIG_Body` (meshes are included as children). Gate: GLB/FBX summary shows skins + all clips. Engine scale check.
@@ -47,22 +49,22 @@ metadata:
 - Upload: Studio `AssetService:CreateAssetAsync` for batches.
 
 ## 5. Cleaning AI-generated / downloaded assets
-1. Import (`import_asset` / `generate_3d` / file). Scale to real size (`world_bounding_box`), origin to the bottom, ground at z=0, `transform_apply`.
+1. Import an available local asset through the appropriate Blender importer. Scale to real size (world bounds from transformed `bound_box` corners; see the local MCP reference), origin to the bottom, ground at z=0, `transform_apply`.
 2. `scene_audit.py --fix purge scale` → `qa_check.py --profile game`. Typical findings: non-manifold, duplicate verts, inverted islands, floating debris, z-fighting shells.
 3. Fix: `make_lods.py --cleanup` (merge/degenerate/loose), recalc normals, delete floating debris (or `remesh` via `sculpt_ops.py` for garbage topology), then `auto_retopo.py --method decimate` to budget.
 4. Re-UV if the UVs are fragmented (`uv_pack.py`) and re-bake from the original (`bake_maps.py --high original`).
-5. Gate: QA passes + `look`. Never ship generated meshes unreviewed.
+5. Gate: QA passes + inspected multi-angle sheets and viewport screenshots. Never ship generated meshes unreviewed.
 
 ## 6. Procedural environment
 1. Terrain/ground mesh, then a scatter tree with `gn_builder.py --spec scatter.json --apply Ground --set Density=... Seed=...` (recipes in `blender-geometry-nodes/references/recipes.md`).
 2. Assets to scatter: optimized props with LODs (recipe 1). Keep instances (don't realize) for engines that support instancing (`export_gpu_instances`).
-3. Gate: `mesh_stats.py` on the evaluated result, plus `look` from the gameplay camera height.
+3. Gate: `mesh_stats.py` on the evaluated result, plus viewport screenshots from the gameplay camera height.
 
 ## 7. Web / AR asset
 Recipe 1 or 2 with budgets `--budget web` (≤30k tris, 1–2 materials, 2k textures) → `export_asset.py --preset web` (meshopt + WebP) → optional `gltf-transform optimize --texture-compress ktx2`. USDZ for iOS AR: `--preset usd --out x.usdz`. Gate: GLB summary (size < 5 MB) and Khronos PBR Neutral look-dev match.
 
 ## 8. Product shot / turntable
-1. Materials with measured values (`build_pbr_material.py --preset`), and QA for z-fighting/floating parts (very visible in close-ups).
+1. Materials from suitable scanned/licensed texture sets or measured presets (`blender-pbr-materials`), source/license records retained, and QA for z-fighting/floating parts (very visible in close-ups).
 2. Set the render resolution, then `turntable.py --objects Product --rig studio --backdrop --frames 120 --lens 85`
 3. `render_batch.py --preset preview --frames 1` → review → `--preset product --frames 1-120 --format PNG` → encode, or `--format MP4`.
 4. Gate: no fireflies or clipped highlights (AgX / Khronos PBR Neutral), and the product sits on the backdrop (contact shadow).

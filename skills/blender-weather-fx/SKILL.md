@@ -9,6 +9,8 @@ metadata:
 
 # Weather FX
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core`. Sky, sun/moon, fog and mood come from `blender-time-of-day`, so run `scene_mood.py` first, then add weather. Rendering settings are in `blender-rendering`.
 
 ## One call each

@@ -5,7 +5,7 @@ Default ratios halve the triangles per level: 1.0, 0.5, 0.25, 0.125. LOD0 is the
 Usage:
   blender -b f.blend -P make_lods.py -- --objects SM_Crate [--ratios 0.5 0.25 0.125]
       [--symmetry] [--cleanup] [--rename] [--collection LODs] [--save out.blend]
-  MCP: import make_lods; print(make_lods.run(objects=["SM_Crate"], ratios=[0.5, 0.2]))
+  MCP: import make_lods; result = make_lods.run(objects=["SM_Crate"], ratios=[0.5, 0.2])
 """
 import os
 import sys
@@ -81,7 +81,7 @@ def run(objects=None, ratios=None, symmetry=False, do_cleanup=False, rename=Fals
         out[src.name] = rec
     return {"ok": True, "lods": out,
             "screen_size_hint": {"LOD1": 0.5, "LOD2": 0.25, "LOD3": 0.125},
-            "note": "check each LOD silhouette (look/review_shots) and UV seams; LOD3+ may need a billboard/imposter"}
+            "note": "check each LOD silhouette (bridge.review/review_shots sheets) and UV seams; LOD3+ may need a billboard/imposter"}
 
 
 if __name__ == "__main__":

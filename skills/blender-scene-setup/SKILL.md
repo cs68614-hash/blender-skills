@@ -9,6 +9,8 @@ metadata:
 
 # Scene Setup & Hygiene
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model and verification steps are in `blender-core`.
 
 ## Procedure

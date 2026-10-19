@@ -9,6 +9,8 @@ metadata:
 
 # Rendering
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core`. Scene lighting and cameras are in `blender-lighting-lookdev`.
 
 ## One call

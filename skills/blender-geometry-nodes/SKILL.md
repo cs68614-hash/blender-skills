@@ -9,6 +9,8 @@ metadata:
 
 # Geometry Nodes
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core`. Build trees with `scripts/gn_builder.py`, a compact JSON spec that's far cheaper than raw bpy. Look up exact socket names first, because they change between versions:
 ```
 scripts/gn_builder.py -- --describe GeometryNodeDistributePointsOnFaces GeometryNodeInstanceOnPoints
@@ -40,7 +42,7 @@ Zones need `input.pair_with_output(output)` (spec key `pairs`), plus items on th
 1. Sketch the data flow: source geometry → selection/masks (fields) → generate/instance → transform/randomize → realize/merge → set materials/shading → output.
 2. `--describe` every node type you'll use, then write the spec and build. Check `node_warnings` and the evaluated counts.
 3. Expose only meaningful inputs (density, seed, scale range, materials), with min/max set.
-4. Look at it (`look`), check `blender-asset-qa` if the result will be exported (realized geometry), and check `blender-game-optimization` for instance counts and tris.
+4. Look at it (native viewport screenshot or `bridge.review`, opening the returned PNGs), check `blender-asset-qa` if the result will be exported (realized geometry), and check `blender-game-optimization` for instance counts and tris.
 5. Ship: either keep it procedural (the .blend/asset library), or apply the modifier / `visual_geometry_to_objects` for exporters.
 
 ## Rules

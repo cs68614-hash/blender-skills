@@ -9,12 +9,14 @@ metadata:
 
 # Sculpting
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core`. The handoff goes to `blender-retopology-uv` → `blender-texture-baking`.
 
 ## Agents: what you can and can't do
 - **Sculpt Mode operators crash Blender in background mode** (`-b`), including `mesh_filter`. Never enter Sculpt Mode headless.
 - Headless or MCP: use `scripts/sculpt_ops.py` for object-level ops: `remesh=SIZE`, `symmetrize=+X`, `multires=N`, `inflate=D`, `detail=STR,SCALE`, `smooth=N`, `apply`. Combine these with Geometry Nodes (`blender-geometry-nodes`: SDF grid booleans/fillets, noise displacement) and shape modeling for procedural organic forms.
-- Live sessions with a UI: brush strokes via `bpy.ops.sculpt.brush_stroke(stroke=[...])` need a 3D View region override and are fragile. Prefer procedural ops, then show the user with `look`. Hand detailed brushwork to the human.
+- Live sessions with a UI: brush strokes via `bpy.ops.sculpt.brush_stroke(stroke=[...])` need a 3D View region override and are fragile. Prefer procedural ops, then show the user with a viewport screenshot. Hand detailed brushwork to the human.
 
 ## Professional workflow
 1. **Base mesh / blockout**: primitives, metaballs, Skin modifier, or a low-poly base at real scale. Proportions first: compare with references and check against a human 1.75 m.
@@ -40,7 +42,7 @@ The execution model is in `blender-core`. The handoff goes to `blender-retopolog
 - Use symmetry (`mesh.use_mirror_x`, radial: `mesh.radial_symmetry`) on characters until the asymmetry pass at the end.
 - Face Sets organise parts (head, torso, hands). Hide them and mask by face set to isolate.
 - Watch density: a 2 m character at voxel 0.005 is already millions of polys. Keep viewport FPS usable and work up in levels.
-- Silhouette first. Check from several angles in flat matcap (`look` shading `solid`) before adding detail.
+- Silhouette first. Check from several angles in flat matcap viewport screenshots or `bridge.review(objects=[...], mode="solid")` sheets before adding detail.
 - Floaters/kitbash for hard-surface details on organic models: separate objects, combined at bake time.
 - Before baking, run `blender-asset-qa` on the high (no inverted parts, no huge self-intersections in the bake range).
 

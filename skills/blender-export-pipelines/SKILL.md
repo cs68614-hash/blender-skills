@@ -9,6 +9,8 @@ metadata:
 
 # Export Pipelines
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core`. Run `blender-asset-qa` (and `blender-game-optimization` for budgets) **before** exporting.
 
 ## One call
@@ -46,6 +48,7 @@ Presets: `roblox`, `roblox_gltf`, `unity`, `unity_skeletal`, `unreal`, `unreal_s
 | Point caches / deforming sims | Alembic (`wm.alembic_export`) |
 
 ## Verify after export (required)
+- For external maps/HDRIs, retain the material source/license manifest alongside the source project; verify that the license permits the requested GLB/source-file delivery, especially for non-CC0 commercial packs. See [material sourcing](../blender-pbr-materials/references/material-sourcing.md).
 - The script returns `ok`, the file size, and for `.glb` a parsed summary (meshes, materials, images, animations, skins, tris, extensions). Compare it with what you expected.
 - For FBX/USD: re-import into an empty scene (`import_scene.fbx` / `wm.usd_import`) and check `dimensions`, the armature scale (must be 1, not 100) and the action count.
 - In the engine: scale against a reference (UE mannequin 180 cm, Unity capsule 2 m, Roblox character 5 studs), normals/smoothing, the normal map's green channel, and animation root motion.

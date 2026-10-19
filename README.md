@@ -6,17 +6,22 @@ Professional Blender workflows packaged as **Agent Skills** for AI coding agents
 
 There are 22 skills covering the full 3D pipeline (modeling, UVs, PBR, baking, rigging, animation, optimization, export, rendering, time of day, weather, simulation and QA), built for **Blender 5.2 LTS+**. Every script is tested in a real Blender.
 
+This fork adds a structured-result Blender MCP adapter and material sourcing
+from Poly Haven or already licensed commercial libraries. See the
+[MCP mapping](skills/blender-core/references/local-mcp.md) and
+[material sourcing guide](skills/blender-pbr-materials/references/material-sourcing.md).
+
 ## Install
 
 **Claude Code** (plugin):
 ```
-/plugin marketplace add EL4CTEO/blender-skills
+/plugin marketplace add cs68614-hash/blender-skills
 /plugin install blender-agent-skills@blender-agent-skills
 ```
 
 **Any agent** (clone, then run the installer):
 ```bash
-git clone https://github.com/EL4CTEO/blender-skills
+git clone https://github.com/cs68614-hash/blender-skills
 ./blender-skills/install/install.sh          # macOS / Linux
 .\blender-skills\install\install.ps1         # Windows
 ```
@@ -33,7 +38,7 @@ The default installs into `~/.claude/skills` and `~/.agents/skills`. `.agents/sk
 | `blender-hardsurface-modeling` | Bevels, booleans, weighted normals |
 | `blender-sculpting` | Organic sculpting workflow |
 | `blender-retopology-uv` | Retopology, UVs, texel density |
-| `blender-pbr-materials` | Correct PBR materials from textures |
+| `blender-pbr-materials` | Poly Haven / licensed material selection, verified texture downloads and correct PBR wiring |
 | `blender-texture-baking` | Normal, AO and curvature maps, ORM |
 | `blender-geometry-nodes` | Procedural modeling from simple JSON |
 | `blender-character-rigging` | Rigify, skinning, game skeletons |
@@ -68,7 +73,8 @@ Same model, same prompts, outputs with the skills vs without them: **[see the co
 
 ```bash
 python tools/validate_skills.py   # spec + token budget checks
-python tools/run_tests.py         # 50 headless Blender tests (BLENDER_EXE to override)
+python -m unittest discover -s skills/blender-pbr-materials/tests -v  # offline download tests
+python tools/run_tests.py         # 53 Blender tests (BLENDER_EXE to override)
 ```
 
 MIT License

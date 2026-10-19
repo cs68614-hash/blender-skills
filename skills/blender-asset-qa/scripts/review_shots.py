@@ -5,7 +5,7 @@ parts), wire (black wireframe over solid -> topology), material (texture/materia
 Usage:
   blender -b f.blend -P review_shots.py -- [--objects A B] [--out //review.png]
       [--views front right back left top three_quarter] [--mode solid|random|wire|material] [--res 512]
-  MCP: prefer the `look` tool; this script is for agents without live viewport access.
+  MCP: use mcp_bridge.review() for contact sheets with live context restoration; use native screenshots for PBR.
 Returns {"sheet": path, "views": [paths]} - open the PNG with your image reader.
 """
 import math
@@ -64,13 +64,15 @@ def run(objects=None, out="", views=None, mode="solid", res=512, **_):
         sh.show_object_outline = True
         sh.color_type = {"random": "RANDOM", "material": "MATERIAL", "wire": "OBJECT"}.get(mode, "SINGLE")
         if mode == "wire":
-            wire_t = _bounds(obs)[1] * 0.006
+            wire_t = _bounds(obs)[1] * 0.001
             for o in obs:
                 if o.type != "MESH":
                     continue
                 w = o.copy()
                 w.data = o.data
-                w.modifiers.new("QA_Wire", "WIREFRAME").thickness = wire_t
+                wire = w.modifiers.new("QA_Wire", "WIREFRAME")
+                wire.thickness = wire_t
+                wire.use_even_offset = False  # acute bevel triangles otherwise produce long spikes
                 w.color = (0, 0, 0, 1)
                 sc.collection.objects.link(w)
                 temp.append(w)

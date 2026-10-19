@@ -9,6 +9,8 @@ metadata:
 
 # Hard-Surface Modeling
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core`. Run `blender-asset-qa` after every modeling pass.
 
 ## Pick the workflow first
@@ -23,7 +25,7 @@ The execution model is in `blender-core`. Run `blender-asset-qa` after every mod
 2. **Apply scale** (`transform_apply(scale=True)`) before bevels, booleans or solidify, because modifier distances use object space.
 3. **Primary → secondary → tertiary** forms. Booleans for cuts and panels, then bevels. Small tertiary details go in normal maps/decals, or into the high-poly as "floaters" for baking.
 4. **UV the base mesh now** (mid-poly). Bevel/Boolean modifiers propagate UVs, but after bevels no edge is sharp enough to auto-seam. Then **build the stack** with `scripts/apply_stack.py -- --objects Body --preset midpoly --cutters Cut1 Cut2`. Order: Mirror → Booleans → Bevel → Weighted Normal → (Triangulate at export).
-5. **Shading check**: smooth shading + Weighted Normal (keep sharp). There must be no gradients across flat faces. View with a matcap or `look` in `solid` shading.
+5. **Shading check**: smooth shading + Weighted Normal (keep sharp). There must be no gradients across flat faces. View with a matcap viewport screenshot or `bridge.review(mode="solid", objects=[...])` sheet.
 6. **QA** with `blender-asset-qa`, then apply the stack only on an export copy (`--apply`), keeping the editable source.
 
 ## Stack rules

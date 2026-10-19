@@ -9,6 +9,8 @@ metadata:
 
 # Lighting & Look-dev
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core`. Render settings are in `blender-rendering`. Full time-of-day, night and fog environments are in `blender-time-of-day`.
 
 ## One call: presentation scene
@@ -27,7 +29,7 @@ This builds a camera framed to the bounding sphere (on the narrower frame axis),
 | Interior | HDRI/sky through the windows + portal area lights in the openings, bounces ≥ 4, then practical lights (lamps) at real wattage |
 | Character / portrait | soft key from above-front, a reflector-like fill, rim or hair light, an eye catchlight. 85–135 mm lens |
 | Stylized / game screenshot | match the engine: one directional + ambient/HDRI, no fancy GI, so it looks like it will in-game |
-- **HDRI**: Poly Haven (CC0) via the blender-mcp `search_assets`/`import_asset`, or `ShaderNodeTexEnvironment` + Mapping (Z rotation aligns the sun). Strength 0.5–1.5. Clamp sun hotspots if they cause fireflies.
+- **HDRI**: Search/download through the host-side Poly Haven helper, or use an existing appropriately licensed HDRI; see [material sourcing](../blender-pbr-materials/references/material-sourcing.md). Load the returned local file using `bpy.data.images.load` and `ShaderNodeTexEnvironment` + Mapping (Z rotation aligns the sun). The current MCP needs no asset-search service. Strength 0.5–1.5. Clamp sun hotspots if they cause fireflies.
 - **Light linking** (4.0+, Cycles + EEVEE): set `light_obj.light_linking.receiver_collection` / `blocker_collection` (on the light **object**) to light only what you choose, like a hero rim that doesn't touch the backdrop. Portals: `light.cycles.is_portal = True` on area lights in window openings.
 - **Units**: point/spot/area in Watts (a 60 W bulb ≈ point light 40–60 W in Blender), sun in W/m² (irradiance; 1000 ≈ physical midday, but use 3–10 with AgX for natural results), emission strength ≈ W/m². Keep lights physically plausible and control the overall image with exposure.
 - **Shadows**: light size controls softness. A bigger, closer light is softer. Contact shadows should exist where objects touch, so check that nothing floats (`blender-asset-qa` `ground_z`).

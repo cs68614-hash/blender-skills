@@ -9,6 +9,8 @@ metadata:
 
 # Facial Rig & Shape Keys
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core`. The body rig is in `blender-character-rigging`.
 
 ## Choose the approach
@@ -26,7 +28,7 @@ The execution model is in `blender-core`. The body rig is in `blender-character-
 4. `--mirror browDownLeft` builds `browDownRight` (topology-independent mirror).
 5. `--report` lists unsculpted keys, the max offset per key, and missing ARKit names. A shape is done only when every key moves and nothing is left over.
 6. Optional: `--drivers FaceCtrl` adds a controller with 0–1 custom properties driving each key, for keyframing in Blender.
-7. Check the extremes and **combinations** (jawOpen + mouthSmile, eyeBlink + eyeSquint) with `look`. Fix them with corrective combination keys driven by the product of two keys.
+7. Check the extremes and **combinations** (jawOpen + mouthSmile, eyeBlink + eyeSquint) with live viewport screenshots or `bridge.review` sheets. Fix them with corrective combination keys driven by the product of two keys.
 
 ## Shape key rules
 - Shapes are **deltas from Basis**. Never change the Basis topology after creating keys (adding or removing verts destroys every key).

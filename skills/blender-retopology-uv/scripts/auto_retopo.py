@@ -6,7 +6,7 @@ The result is shrinkwrapped back onto the source and named <source>_low.
 Usage:
   blender -b f.blend -P auto_retopo.py -- --objects Sculpt [--method quadriflow|decimate|planar]
       [--tris 10000] [--voxel 0] [--symmetry] [--save out.blend]
-  MCP: import auto_retopo; print(auto_retopo.run(objects=["Sculpt"], tris=8000))
+  MCP: import auto_retopo; result = auto_retopo.run(objects=["Sculpt"], tris=8000)
 --tris is the triangle budget (quadriflow targets tris/2 quads).
 """
 import math
@@ -78,7 +78,7 @@ def run(objects=None, method="quadriflow", tris=10000, voxel=0.0, symmetry=False
                          "tris_after": bx.mesh_tris(low, evaluated=False),
                          "uvs_kept": bool(low.data.uv_layers) and method != "quadriflow"}
     return {"ok": True, "method": method, "objects": out,
-            "next": "check edge flow (look wireframe), unwrap (uv_pack.py), bake (blender-texture-baking)"}
+            "next": "check edge flow (wireframe review sheets), unwrap (uv_pack.py), bake (blender-texture-baking)"}
 
 
 if __name__ == "__main__":

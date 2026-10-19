@@ -9,6 +9,8 @@ metadata:
 
 # Pipeline Automation
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core` (`run_in_blender.py` finds Blender and prints only the JSON results).
 
 ## Batch one-liners

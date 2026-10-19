@@ -2,13 +2,15 @@
 name: blender-core
 description: Foundation for any Blender 5.2+ task an agent drives - running bpy via MCP (live) or headless CLI, context overrides, locale-safe node lookup, enum discovery, 5.x API changes, verification. Use first for any Blender, bpy, .blend or 3D-asset request; routes to the specialized blender-* skills.
 license: MIT
-compatibility: Blender 5.2 LTS or newer. Optional blender-mcp server for live sessions.
 metadata:
   author: blender-agent-skills
   version: "1.1.0"
+  compatibility: "Blender 5.2 LTS or newer; optional live Blender MCP."
 ---
 
 # Blender Core (5.2 LTS+)
+
+**Local MCP:** Before live calls, read the [installed MCP mapping](references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
 
 ## Route to the specialized skill
 | Task | Skill |
@@ -17,7 +19,7 @@ metadata:
 | Hard-surface modeling, bevels, booleans, normals | `blender-hardsurface-modeling` |
 | Sculpting, multires, remesh | `blender-sculpting` |
 | Retopology, UV unwrap, texel density | `blender-retopology-uv` |
-| PBR materials, color spaces, texture sets | `blender-pbr-materials` |
+| PBR materials, Poly Haven / licensed sources, color spaces, texture sets | `blender-pbr-materials` |
 | Baking high→low maps (normal, AO, curvature, ...) | `blender-texture-baking` |
 | Geometry Nodes, procedural modeling | `blender-geometry-nodes` |
 | Body rigging, Rigify, weight painting | `blender-character-rigging` |
@@ -36,18 +38,24 @@ metadata:
 | End-to-end playbooks (prop, character, Roblox, product shot) | `blender-workflow-recipes` |
 
 ## Execute
-**Live (blender-mcp `execute_blender_code`)**: work in small steps and print only what you need. To call a skill script, import it:
+**Live (local `mcp__blender__execute_blender_code`)**: read [references/local-mcp.md](references/local-mcp.md) for the installed tool mapping. Use dedicated MCP tools for inspection, and the bridge for skill scripts. Each call uses a fresh namespace and must assign a JSON-serializable dict to `result`:
+
+Replace `<skills_dir>` with the absolute installed skills directory.
 ```python
-import sys, importlib; sys.path.insert(0, r"<skills_dir>/blender-asset-qa/scripts")
-import qa_check; importlib.reload(qa_check); print(qa_check.run(objects=["Chair"]))
+import sys
+p = "<skills_dir>/blender-core/scripts"
+if p not in sys.path:
+    sys.path.insert(0, p)
+import mcp_bridge as bridge
+result = bridge.run("blender-asset-qa", "qa_check", objects=["Chair"])
 ```
-Each MCP call runs in a **fresh namespace**: re-`import` in every call. That's cheap because modules stay cached in `sys.modules`. `reload` only after editing a script.
+Re-import in each call. Modules remain cached; `reload=True` reloads the target script after editing it. Use `importlib.reload(mcp_bridge)` only after editing the bridge itself.
 **Headless (any agent with a shell)**: this prints only the script's JSON (`@@JSON@@` lines):
 ```
 python <skills_dir>/blender-core/scripts/run_in_blender.py --blend in.blend <script.py> -- --objects Chair --save out.blend
 python <skills_dir>/blender-core/scripts/run_in_blender.py --expr "import bpy; print(len(bpy.data.objects))"
 ```
-Raw form: `blender -b in.blend --factory-startup --python-exit-code 1 -P x.py -- args`. Every script here exposes `run(**kw) -> dict` and the same flags after `--`.
+Raw form: `blender -b in.blend --factory-startup --python-exit-code 1 -P x.py -- args`. Blender scripts expose `run(**kw) -> dict` and flags after `--`. The host-only `blender-pbr-materials/scripts/fetch_polyhaven.py` instead runs directly with system Python; see its Usage examples.
 **First call in a session**: `scripts/env_report.py`, which returns the version, engines, GPU, add-ons, units, color management and scene counts.
 
 ## Rules
@@ -72,7 +80,7 @@ Raw form: `blender -b in.blend --factory-startup --python-exit-code 1 -P x.py --
 ## Verify (required before saying "done")
 1. Numbers, not adjectives: report tris, objects, materials, dimensions (`ob.dimensions`) and the output files written.
 2. Geometry changed → run `blender-asset-qa` `qa_check.py` (z-fighting, detached parts, non-manifold, flipped normals, scale).
-3. Look at it: MCP `look` (`mode="angles"`, shading `material`/`wireframe`). Headless: `blender-asset-qa/scripts/review_shots.py` renders contact sheets.
+3. Look at it: live screenshots for PBR materials; `bridge.review(objects=[...], mode="solid")` and `mode="wire"` for multi-angle geometry checks, then open the returned PNGs. See [references/local-mcp.md](references/local-mcp.md). Headless: `blender-asset-qa/scripts/review_shots.py` renders contact sheets.
 4. Re-read your own output: confirm that exported files exist and that their size is non-zero.
 
 ## References

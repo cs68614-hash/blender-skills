@@ -9,6 +9,8 @@ metadata:
 
 # Animation
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core` (its `references/bpy-patterns.md` has verified keyframe/driver snippets). Rigs are in `blender-character-rigging`.
 
 ## 5.x data model (what changed)
@@ -22,7 +24,7 @@ The execution model is in `blender-core` (its `references/bpy-patterns.md` has v
 2. **Breakdowns**: add in-betweens that define arcs and spacing.
 3. **Spline**: switch to `BEZIER`, fix spacing in the Graph Editor, and clean overshoot. Auto-clamped handles avoid overshoot.
 4. **Polish**: offsets/overlap (follow-through on hair, tails, cloth bones), arcs, moving holds (never a perfectly frozen character), and contact stability (feet locked with IK).
-5. **Review**: MCP `look(mode="frames", frame_count=8)` or a Workbench playblast (`blender-rendering`).
+5. **Review**: `bridge.review(objects=[...], frames=[...])` followed by opening the returned sheets or a Workbench playblast (`blender-rendering`).
 
 ## Game animation rules
 - **One action per clip**, named `<Rig>_<Clip>` or just `<Clip>`, with a fake user so it survives saving.

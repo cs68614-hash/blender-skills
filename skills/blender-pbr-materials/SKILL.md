@@ -1,6 +1,6 @@
 ---
 name: blender-pbr-materials
-description: Physically based materials in Blender 5.2 - metal/roughness rules, Principled BSDF inputs, color spaces (sRGB vs Non-Color), measured albedo/F0 values, texture-set auto-wiring, ORM channel packing, DirectX vs OpenGL normals, alpha modes, displacement, view transforms (AgX, Khronos PBR Neutral), engine-ready material rules. Use when creating, fixing, or exporting materials and textures.
+description: Choose and build Blender PBR materials from Poly Haven CC0 scans, already licensed commercial textures, or procedural sources. Includes API search/download, source licenses, physical scale, grain direction, color spaces, normal maps, ORM packing and game export. Use for material selection, texturing, look development or texture troubleshooting.
 license: MIT
 metadata:
   author: blender-agent-skills
@@ -9,9 +9,13 @@ metadata:
 
 # PBR Materials
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core`. Measured values are in [references/pbr-values.md](references/pbr-values.md).
 
 ## Fast paths
+- Choose external textures/HDRIs: read [references/material-sourcing.md](references/material-sourcing.md). For realistic surfaces, compare suitable scanned materials before defaulting to procedural noise; reuse user-specified or already licensed sources where appropriate. Poly Haven CC0 supports commercial games; paid suppliers follow their own licenses and authorized budgets.
+- Poly Haven API → local maps: run host-side `scripts/fetch_polyhaven.py search "weathered wood"`, then `plan <id>` / `download <id> --resolution 2k --out <dir>`. Keep the returned `source_manifest.json`; feed `texture_files` to the material builder. The current Blender MCP needs no new asset-search tools.
 - Texture set → material: `scripts/build_pbr_material.py -- --name M_Crate --textures //tex/crate --objects SM_Crate`. It detects maps by filename (Poly Haven, ambientCG, Substance, UE suffixes), sets color spaces, splits ORM, flips DirectX normals, and routes AO to glTF.
 - Solid physically-plausible material: `--preset gold|iron|plastic|rubber|wood|glass|skin|...` with an optional `--color R G B` (sRGB).
 

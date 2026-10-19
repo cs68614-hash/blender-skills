@@ -16,6 +16,8 @@ jobs:
       - run: python tools/sync_shared.py --check
       - run: python tools/validate_skills.py
       - run: python tools/trigger_check.py
+      - name: Test material sourcing (offline)
+        run: python -m unittest discover -s skills/blender-pbr-materials/tests -v
       - run: bash install/install.sh --project "$RUNNER_TEMP/p" --agent all --copy
 
   blender-tests:

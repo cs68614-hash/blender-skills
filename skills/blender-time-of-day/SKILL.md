@@ -9,6 +9,8 @@ metadata:
 
 # Time of Day & Atmosphere
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core`. Studio and product lighting are in `blender-lighting-lookdev`, render settings in `blender-rendering`, and rain, snow, wetness and lightning in `blender-weather-fx`.
 
 ## One call

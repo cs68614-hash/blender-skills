@@ -9,6 +9,8 @@ metadata:
 
 # Add-on (Extension) Development
 
+**Local MCP:** Before live calls, read the [installed MCP mapping](../blender-core/references/local-mcp.md) for structured `result` returns, screenshots, and `bridge.review`.
+
 The execution model is in `blender-core`. Start from `assets/addon_template/` (validated, built, and registered in CI): `blender_manifest.toml`, `__init__.py`, `operators.py`, `ui.py`.
 
 ## Procedure
